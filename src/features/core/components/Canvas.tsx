@@ -1,23 +1,49 @@
 'use client';
 
+import React from "react";
+
+import {Color} from "three";
 import {Canvas as BaseCanvas} from "@react-three/fiber";
-import {Perf} from "r3f-perf";
+import {OrbitControls, Stats} from "@react-three/drei";
+import {Physics} from "@react-three/cannon";
+import {Perf} from 'r3f-perf';
 
-import Plane from "@/features/environment/components/Plane";
-import Controls from "@/features/core/components/Controls";
+import AmbientLight from "@/features/environment/components/AmbientLight";
+import DirectionalLight from "@/features/environment/components/DirectionalLight";
+
+const fov = 60;
+const aspect = 1920 / 1080;
 
 
-const MainCanvas = () => {
+type canvasProps = {
+    children?: React.ReactNode,
+};
+
+
+const Canvas = ({children}: canvasProps) => {
     return (
-        <BaseCanvas className="bg-black" shadows camera={{position: [-6, 7, 7]}}>
-            <ambientLight color={"white"} intensity={0.3} />
-            <Plane/>
+        <BaseCanvas
+            shadows={true}
+            camera={{
+                fov: fov, aspect: aspect,
+                near: 1.0, far: 10000.0,
+                position: [-10, 420, -400]
+            }}
+            onCreated={({scene}) => (scene.background = new Color('lightblue'))}
+        >
+            <AmbientLight/>
+            <DirectionalLight/>
+            <OrbitControls/>
 
-            <Controls/>
+            <Physics gravity={[0, -40, 0]}>
+                {children}
+            </Physics>
+
             <Perf />
+            <Stats/>
         </BaseCanvas>
     );
 };
 
 
-export default MainCanvas;
+export default Canvas;
